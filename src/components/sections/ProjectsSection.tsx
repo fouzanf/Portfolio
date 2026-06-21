@@ -203,29 +203,29 @@ export function ProjectsSection() {
   
   const [activeIndex, setActiveIndex] = useState(0);
   const [hintVisible, setHintVisible] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
-    if (isMobile || !containerRef.current || !trackRef.current) return;
+    // isMobile === null means "not yet measured" — never run GSAP until we know.
+    // isMobile === true  means mobile — skip GSAP entirely to prevent DOM mutation.
+    if (isMobile !== false || !containerRef.current || !trackRef.current) return;
 
     gsap.registerPlugin(ScrollTrigger);
 
     const cards = gsap.utils.toArray(".project-card");
-    
-    const trigger = ScrollTrigger.create({
+
+    const pinTrigger = ScrollTrigger.create({
       trigger: containerRef.current,
       pin: true,
-      pinSpacing: true, // we control the spacing in css
+      pinSpacing: true,
       start: "top top",
       end: () => `+=${(cards.length - 1) * window.innerWidth * 0.85}`,
       scrub: 1.2,
@@ -234,13 +234,11 @@ export function ProjectsSection() {
       onUpdate: (self) => {
         const index = Math.round(self.progress * (cards.length - 1));
         setActiveIndex(index);
-        if (self.progress > 0.05) {
-          setHintVisible(false);
-        }
+        if (self.progress > 0.05) setHintVisible(false);
       }
     });
 
-    gsap.to(cards, {
+    const scrollTween = gsap.to(cards, {
       xPercent: -100 * (cards.length - 1),
       ease: "none",
       scrollTrigger: {
@@ -252,7 +250,10 @@ export function ProjectsSection() {
     });
 
     return () => {
-      trigger.kill();
+      // Kill both triggers so no inline xPercent transform leaks onto the cards
+      pinTrigger.kill();
+      scrollTween.scrollTrigger?.kill();
+      scrollTween.revert();
     };
   }, [isMobile]);
 
@@ -280,6 +281,12 @@ export function ProjectsSection() {
     const prevIdx = Math.max(activeIndex - 1, 0);
     scrollToCard(prevIdx);
   };
+
+  // Render nothing during SSR / before the viewport width is known.
+  // The PageLoader covers this gap, so users never see the empty frame.
+  if (isMobile === null) {
+    return <section id="projects" className="bg-black" />;
+  }
 
   if (isMobile) {
     return (
