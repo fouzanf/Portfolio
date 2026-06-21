@@ -116,17 +116,56 @@ export function Chatbot() {
     ]);
   };
 
+  const prefersReducedMotion =
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false;
+
+  const windowVariants = {
+    hidden: prefersReducedMotion
+      ? { opacity: 0 }
+      : { opacity: 0, scale: 0.92, y: 16 },
+    visible: prefersReducedMotion
+      ? { opacity: 1 }
+      : { opacity: 1, scale: 1, y: 0 },
+    exit: prefersReducedMotion
+      ? { opacity: 0 }
+      : { opacity: 0, scale: 0.95, y: 10 },
+  };
+
+  const quickReplyContainer = {
+    hidden: {},
+    visible: {
+      transition: prefersReducedMotion
+        ? {}
+        : { staggerChildren: 0.07, delayChildren: 0.18 },
+    },
+  };
+
+  const quickReplyItem = {
+    hidden: prefersReducedMotion
+      ? { opacity: 1, y: 0, scale: 1 }
+      : { opacity: 0, y: 8, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { type: "spring" as const, stiffness: 380, damping: 26 },
+    },
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-[200] font-sans">
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20, rotateX: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            style={{ transformOrigin: "bottom right", perspective: "1000px" }}
-            className="chatbot-window mb-3 md:mb-6"
+            variants={windowVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ type: "spring", stiffness: 320, damping: 26 }}
+            style={{ transformOrigin: "bottom right" }}
+            className="chatbot-window"
           >
             {/* SVG Animated Neural Network Background */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0">
@@ -154,8 +193,8 @@ export function Chatbot() {
               <div className="chatbot-avatar">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-sm text-white tracking-tight flex items-center gap-1.5">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-sm text-white tracking-tight">
                   Mohammed.ai
                 </h3>
                 <p className="text-[11px] text-white/50">Neural Assistant</p>
@@ -183,15 +222,18 @@ export function Chatbot() {
               {messages.map((msg, index) => {
                 const isUser = msg.role === "user";
                 return (
-                  <div
+                  <motion.div
                     key={index}
+                    initial={prefersReducedMotion ? {} : { opacity: 0, y: 6, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.28, delay: index * 0.055, ease: "easeOut" }}
                     className={isUser ? "message-user" : "message-ai"}
                   >
                     {msg.content}
-                  </div>
+                  </motion.div>
                 );
               })}
-              
+
               {/* Typing indicator */}
               {isLoading && (
                 <div className="typing-indicator">
@@ -202,20 +244,28 @@ export function Chatbot() {
               )}
             </div>
 
-            {/* Quick Reply Chips below first message */}
+            {/* Quick Reply Chips — staggered entrance */}
             {messages.length === 1 && !isLoading && (
-              <div className="px-5 pb-3 flex flex-wrap gap-2 z-10">
+              <motion.div
+                className="px-4 pb-3 flex flex-wrap gap-2 z-10"
+                initial="hidden"
+                animate="visible"
+                variants={quickReplyContainer}
+              >
                 {QUICK_REPLIES.map((reply, idx) => (
-                  <button
+                  <motion.button
                     key={idx}
+                    variants={quickReplyItem}
+                    whileHover={prefersReducedMotion ? {} : { scale: 1.06, y: -1 }}
+                    whileTap={prefersReducedMotion ? {} : { scale: 0.94 }}
                     onClick={() => handleQuickReply(reply)}
-                    className="text-[11px] text-cyan-200 hover:text-white bg-white/5 hover:bg-cyan-500/20 border border-white/5 hover:border-cyan-400/50 px-3 py-2 rounded-xl flex items-center gap-1 transition-all duration-200 cursor-pointer"
+                    className="text-[11px] text-cyan-200 hover:text-white bg-white/5 hover:bg-cyan-500/20 border border-white/5 hover:border-cyan-400/50 px-3 py-2 rounded-xl flex items-center gap-1 cursor-pointer"
                   >
                     <span>{reply}</span>
                     <ArrowRight className="w-3 h-3 opacity-60" />
-                  </button>
+                  </motion.button>
                 ))}
-              </div>
+              </motion.div>
             )}
 
             {/* Input Form */}
@@ -246,25 +296,57 @@ export function Chatbot() {
         )}
       </AnimatePresence>
 
-      <div className="chatbot-launcher">
+      {/* Launcher button — idle glow pulse when closed */}
+      <div className={`chatbot-launcher ${!isOpen ? "chatbot-launcher-idle" : ""}`}>
         {/* Spinning gradient ring */}
         <div className="chatbot-ring" />
-        
-        {/* Online badge — ABOVE and to the RIGHT, z-index 10 */}
+
+        {/* Online badge */}
         {!isOpen && (
-          <div className="online-badge">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ delay: 0.4, type: "spring", stiffness: 400, damping: 25 }}
+            className="online-badge"
+          >
             <span className="online-dot" />
             <span className="online-text">Online</span>
-          </div>
+          </motion.div>
         )}
-        
-        {/* Button on top of ring */}
-        <button 
+
+        {/* Button */}
+        <motion.button
           className="chatbot-btn"
           onClick={() => setIsOpen(!isOpen)}
+          whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+          whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
-          {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-6 h-6" />}
-        </button>
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.span
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                <X className="w-6 h-6" />
+              </motion.span>
+            ) : (
+              <motion.span
+                key="open"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                <Bot className="w-6 h-6" />
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.button>
       </div>
     </div>
   );

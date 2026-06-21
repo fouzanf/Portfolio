@@ -111,7 +111,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0], index: n
   return (
     <div
       ref={cardRef}
-      className="project-card glass-card rounded-3xl group transition-colors duration-300 relative overflow-visible"
+      className="project-card glass-card rounded-3xl group transition-colors duration-300 relative overflow-hidden md:overflow-visible"
       style={{ '--accent': project.accent } as React.CSSProperties}
     >
       <div className="project-card-inner">
@@ -130,22 +130,22 @@ function ProjectCard({ project, index }: { project: typeof projects[0], index: n
 
         {/* Header (Top) */}
         <div className="project-card-top relative z-20">
-          <div>
+          <div className="project-card-title-area">
             <div className="project-number mb-2">{project.tagline}</div>
             <h3 className="project-title">{project.name}</h3>
             {project.highlight && (
-              <div className="project-highlight text-xs font-mono text-cyan-400 mt-2 font-semibold tracking-wider">
+              <div className="project-highlight font-mono text-cyan-400 mt-2 font-semibold tracking-wider">
                 {project.highlight}
               </div>
             )}
           </div>
-          <div className="flex gap-3">
-            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300 shadow-[0_0_0_rgba(0,245,255,0)] hover:shadow-[0_0_15px_rgba(0,245,255,0.4)]">
-              <Github className="w-5 h-5" />
+          <div className="flex gap-2 md:gap-3 shrink-0">
+            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300 shadow-[0_0_0_rgba(0,245,255,0)] hover:shadow-[0_0_15px_rgba(0,245,255,0.4)]">
+              <Github className="w-4 h-4 md:w-5 md:h-5" />
             </a>
             {project.liveUrl !== "#" && (
-              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300 shadow-[0_0_0_rgba(0,245,255,0)] hover:shadow-[0_0_15px_rgba(0,245,255,0.4)]">
-                <ExternalLink className="w-5 h-5" />
+              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300 shadow-[0_0_0_rgba(0,245,255,0)] hover:shadow-[0_0_15px_rgba(0,245,255,0.4)]">
+                <ExternalLink className="w-4 h-4 md:w-5 md:h-5" />
               </a>
             )}
           </div>

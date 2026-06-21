@@ -937,6 +937,13 @@ section {
   flex-shrink: 0; /* CRITICAL — prevents cards from squishing */
 }
 
+/* Title wrapper in card header — must be able to shrink */
+.project-card-title-area {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
 /* Global Reset & Container */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -1793,6 +1800,25 @@ img, video, canvas, svg {
   line-height: 1.1;
   position: relative;
   z-index: 1;
+  overflow-wrap: break-word; /* gentler — only breaks when truly necessary */
+}
+
+.project-highlight {
+  font-size: 0.7rem;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Launcher idle pulse */
+@keyframes launcherPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+  50%       { box-shadow: 0 0 0 14px rgba(59, 130, 246, 0.18); }
+}
+.chatbot-launcher-idle .chatbot-btn {
+  animation: launcherPulse 2.8s ease-in-out infinite;
+}
+.chatbot-btn {
+  transition: box-shadow 0.25s ease;
 }
 
 /* MissionBriefSection — add proper padding */
@@ -2134,16 +2160,23 @@ img, video, canvas, svg {
     height: auto !important;
     width: 100% !important;
     max-width: 100% !important;
+    /* overflow: hidden via md:overflow-visible in JSX */
   }
   .project-card-inner {
     height: auto !important;
     grid-template-rows: auto auto auto !important;
+    /* Tighter padding on tablet */
+    padding: 1.25rem !important;
   }
   .project-card-content {
     flex: none !important;
-    min-height: 180px !important;
+    min-height: 160px !important;
     height: auto !important;
   }
+  .project-title {
+    font-size: clamp(1.1rem, 5vw, 1.6rem) !important;
+  }
+  .project-highlight { font-size: 0.65rem !important; }
 
   /* ── Section headings ── */
   .section-heading-wrapper {
@@ -2159,11 +2192,18 @@ img, video, canvas, svg {
   /* ── Contact ── */
   .contact-card  { padding: 1.5rem !important; gap: 2rem !important; }
 
-  /* ── Chatbot — constrain height so window never reaches hero ── */
+  /* ── Chatbot — break free from the outer fixed container;
+        anchor window directly to viewport with proper margins ── */
   .chatbot-window {
-    width: min(360px, calc(100vw - 2rem));
-    height: min(460px, calc(100dvh - 130px));
-    max-height: min(460px, calc(100dvh - 130px));
+    position: fixed !important;
+    /* sit above the launcher: bottom(1rem) + btn(58px) + gap(0.75rem) */
+    bottom: calc(1rem + 58px + 0.75rem) !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    width: auto !important;
+    max-width: none !important;
+    height: min(460px, calc(100dvh - 150px));
+    max-height: min(460px, calc(100dvh - 150px));
   }
   .chatbot-launcher { right: 1rem; bottom: 1rem; }
 
@@ -2216,17 +2256,23 @@ img, video, canvas, svg {
   .section-heading,
   .section-title { font-size: clamp(1.8rem, 8vw, 2.8rem) !important; }
 
-  /* Project card inner tighter padding */
-  .project-card-inner { padding: 1rem !important; gap: 0.75rem !important; }
+  /* Project card inner tighter padding at 480px */
+  .project-card-inner { padding: 0.875rem !important; gap: 0.625rem !important; }
+  .project-title { font-size: clamp(1rem, 5vw, 1.4rem) !important; }
 
   /* Command palette */
   .command-palette { top: 6%; max-width: calc(100vw - 1.5rem); }
 
-  /* Chatbot — smaller height on phones */
+  /* Chatbot — 480px phones: 12px margins, above launcher */
   .chatbot-window {
-    width: calc(100vw - 1.5rem);
-    height: min(400px, calc(100dvh - 110px));
-    max-height: min(400px, calc(100dvh - 110px));
+    position: fixed !important;
+    bottom: calc(0.75rem + 58px + 0.75rem) !important;
+    right: 0.75rem !important;
+    left: 0.75rem !important;
+    width: auto !important;
+    max-width: none !important;
+    height: min(400px, calc(100dvh - 130px));
+    max-height: min(400px, calc(100dvh - 130px));
     border-radius: 18px;
   }
   .chatbot-launcher { right: 0.75rem; bottom: 0.75rem; }
@@ -2254,6 +2300,16 @@ img, video, canvas, svg {
   .tech-pill span { display: none; }
   .tech-pill img  { width: 20px; height: 20px; }
   .tech-pill      { padding: 10px 14px; }
+
+  /* Project card — tighter inner padding, smaller title to prevent mid-word break */
+  .project-card-inner { padding: 0.75rem !important; }
+  .project-title {
+    font-size: 0.875rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .project-highlight { font-size: 0.6rem !important; }
 }
 
 /* ════════════════════════════════════════════════
