@@ -1,118 +1,243 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Download, ArrowRight } from "lucide-react";
-import { Button } from "../ui/Button";
+import { useEffect, useRef, useState } from "react";
+import { Hero3DScene } from "./Hero3DScene";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import { ArrowRight, Download } from "lucide-react";
+
+const ROLES = [
+  "Generative AI Developer",
+  "Full-Stack Engineer",
+  "AI Product Builder",
+  "LLM Systems Architect",
+];
 
 export function HeroSection() {
-  const { scrollY } = useScroll();
-  // 3D Perspective scroll-driven transformations
-  const rotateX = useTransform(scrollY, [0, 600], [0, 15]);
-  const y = useTransform(scrollY, [0, 600], [0, 80]);
-  const scale = useTransform(scrollY, [0, 600], [1, 0.95]);
-  const opacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const containerRef = useRef<HTMLElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const primaryBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Magnetic button
+  const [btnPos, setBtnPos] = useState({ x: 0, y: 0 });
+
+  // Mouse spotlight
+  const [spotlight, setSpotlight] = useState({ x: 0, y: 0, visible: false });
+
+  // Typewriter
+  const [roleIdx, setRoleIdx] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  // Typewriter effect
+  useEffect(() => {
+    const current = ROLES[roleIdx];
+    if (!deleting && typed === current) {
+      const t = setTimeout(() => setDeleting(true), 2400);
+      return () => clearTimeout(t);
+    }
+    if (deleting && typed === "") {
+      setDeleting(false);
+      setRoleIdx((i) => (i + 1) % ROLES.length);
+      return;
+    }
+    const speed = deleting ? 32 : 78;
+    const t = setTimeout(() => {
+      setTyped((s) => (deleting ? s.slice(0, -1) : current.slice(0, s.length + 1)));
+    }, speed);
+    return () => clearTimeout(t);
+  }, [typed, deleting, roleIdx]);
+
+  // Magnetic primary button
+  useEffect(() => {
+    const btn = primaryBtnRef.current;
+    if (!btn) return;
+    const RADIUS = 100;
+    const handleMove = (e: MouseEvent) => {
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < RADIUS) {
+        setBtnPos({ x: dx * 0.28, y: dy * 0.28 });
+      } else {
+        setBtnPos({ x: 0, y: 0 });
+      }
+    };
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, []);
+
+  // Mouse spotlight in hero
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const handleMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      setSpotlight({ x: e.clientX - rect.left, y: e.clientY - rect.top, visible: true });
+    };
+    const handleLeave = () => setSpotlight((s) => ({ ...s, visible: false }));
+    el.addEventListener("mousemove", handleMove);
+    el.addEventListener("mouseleave", handleLeave);
+    return () => {
+      el.removeEventListener("mousemove", handleMove);
+      el.removeEventListener("mouseleave", handleLeave);
+    };
+  }, []);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Wipe any stale inline styles left by a previous mount's animations BEFORE
+    // the new context records "to" snapshots. clearProps must run outside the
+    // context so ctx.revert() doesn't restore the old stale values.
+    gsap.set([".hero-badge", ".name-word", ".hero-cta", ".hud-bracket"], {
+      clearProps: "all",
+    });
+
+    // gsap.context() scopes all tweens/ScrollTriggers to containerRef.
+    // ctx.revert() on cleanup kills every tween + ScrollTrigger and restores
+    // the pre-tween state, so remounts always start from a clean slate.
+    const ctx = gsap.context(() => {
+      if (containerRef.current && textRef.current) {
+        const parallaxTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+        parallaxTl.to(textRef.current, { y: 200, ease: "none" }, 0);
+        parallaxTl.to("#hero-3d-scene", { y: 50, ease: "none" }, 0);
+      }
+
+      const heroTl = gsap.timeline({ delay: 0.2 });
+      heroTl
+        .from(".hero-badge", { y: -20, opacity: 0, duration: 0.6, ease: "power3.out", delay: 0.5 })
+        .from(".hero-role", { y: 30, opacity: 0, duration: 0.7, ease: "power3.out" }, "-=0.4")
+        .from(".hero-cta", { y: 20, opacity: 0, duration: 0.6, stagger: 0.12, ease: "power3.out" }, "-=0.3")
+        .from(".hud-bracket", { opacity: 0, scale: 0.8, duration: 0.8, stagger: 0.1 }, "-=0.5");
+
+      gsap.from(".name-word", {
+        y: 150,
+        opacity: 0,
+        rotateX: 90,
+        transformPerspective: 800,
+        duration: 1.2,
+        stagger: 0.15,
+        ease: "power4.out",
+        delay: 0.5,
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden" style={{ perspective: 1200 }}>
-      {/* Background glow effects */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-purple-600/20 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
+    <section id="hero" ref={containerRef} className="hero-section">
+      <Hero3DScene />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10 w-full flex flex-col items-center text-center">
-        <motion.div 
-          style={{ rotateX, y, scale, opacity, transformStyle: "preserve-3d" }}
-          className="flex flex-col items-center text-center w-full"
-        >
-          {/* Social Proof Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
-          >
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-sm font-medium text-blue-100">Top 1% in Data Structures & Algorithms (Young Turks)</span>
-          </motion.div>
+      {/* Mouse spotlight */}
+      <div
+        className="hero-spotlight"
+        style={{
+          left: spotlight.x,
+          top: spotlight.y,
+          opacity: spotlight.visible ? 1 : 0,
+        }}
+      />
 
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter mb-8 leading-[1.1]"
-          >
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">Generative AI</span>
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">& Full-Stack Developer</span>
-          </motion.h1>
+      <div className="nebula nebula-1" />
+      <div className="nebula nebula-2" />
 
-          {/* Subheadline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg md:text-xl text-white/60 max-w-3xl mb-12 leading-relaxed"
-          >
-            Building production-grade RAG pipelines, AI proxy gateways, knowledge graphs, and LLM-integrated web applications that scale.
-          </motion.p>
+      {/* HUD corner brackets */}
+      <div className="absolute inset-0 pointer-events-none z-[5] max-w-7xl mx-auto h-full px-6 flex items-center justify-center">
+        <div className="relative w-full h-[600px] flex items-center justify-center">
+          <div className="hud-bracket absolute -top-10 -left-10 w-8 h-8 border-t-2 border-l-2 border-cyan-400" />
+          <div className="hud-bracket absolute -top-10 -right-10 w-8 h-8 border-t-2 border-r-2 border-cyan-400" />
+          <div className="hud-bracket absolute -bottom-10 -left-10 w-8 h-8 border-b-2 border-l-2 border-cyan-400" />
+          <div className="hud-bracket absolute -bottom-10 -right-10 w-8 h-8 border-b-2 border-r-2 border-cyan-400" />
+        </div>
+      </div>
+
+      <div className="shooting-stars absolute inset-0 pointer-events-none z-[6]">
+        <div className="star star-1" />
+        <div className="star star-2" />
+        <div className="star star-3" />
+      </div>
+
+      {/* Content */}
+      <div className="hero-content" ref={textRef}>
+        {/* Availability badge */}
+        <div className="hero-badge">
+          <span className="badge-dot" />
+          <span>Available for hire</span>
+          <span className="badge-sep">·</span>
+          <span>Building in public</span>
+        </div>
+
+        {/* Name */}
+        <h1 className="hero-name">
+          <span className="name-word">Mohammed</span>{" "}
+          <span className="name-word">Muneeb</span>{" "}
+          <span className="name-word gradient-text">Fouzan</span>
+        </h1>
+
+        {/* Typewriter role */}
+        <p className="hero-role">
+          <span className="typed-text">{typed}</span>
+          <span className="typed-cursor" aria-hidden>|</span>
+        </p>
 
         {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <Button size="lg" onClick={() => document.getElementById('projects')?.scrollIntoView()}>
-            View Projects
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="lg"
-            onClick={() => window.open("https://drive.google.com/file/d/19g6D8H_bdxX3LxCaXq5ReE6X-EeJ1yuB/view?usp=drive_link", "_blank")}
+        <div className="hero-buttons">
+          <button
+            ref={primaryBtnRef}
+            className="hero-cta hero-cta-primary"
+            onClick={() => {
+              const el = document.querySelector("#projects");
+              if (!el) return;
+              const lenis = (window as any).__lenis;
+              if (lenis) {
+                lenis.scrollTo(el, { duration: 1.4, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+              } else {
+                el.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            style={{
+              transform: `translate(${btnPos.x}px, ${btnPos.y}px)`,
+              transition:
+                btnPos.x === 0 && btnPos.y === 0
+                  ? "transform 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease"
+                  : "transform 0.1s ease, box-shadow 0.2s ease",
+            }}
           >
-            Download Resume
-            <Download className="w-4 h-4 ml-2" />
-          </Button>
-        </motion.div>
+            <span>View Projects</span>
+            <ArrowRight size={16} strokeWidth={2} />
+          </button>
 
-        {/* Futuristic HUD Panel */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16 w-full max-w-4xl glass-panel rounded-2xl p-6 border border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6 text-left relative overflow-hidden"
-        >
-          {/* Ambient glow inside HUD */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
-          
-          <div className="border-r border-white/5 pr-4">
-            <div className="text-xs font-mono text-white/40 mb-1">SYSTEM_STATUS</div>
-            <div className="text-lg font-bold text-green-400 flex items-center gap-2 font-mono">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              ONLINE_
-            </div>
-          </div>
+          <a
+            href="https://drive.google.com/file/d/19g6D8H_bdxX3LxCaXq5ReE6X-EeJ1yuB/view"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hero-cta hero-cta-secondary"
+          >
+            <Download size={15} strokeWidth={2} />
+            <span>Download Resume</span>
+          </a>
+        </div>
 
-          <div className="border-r border-white/5 pr-4 md:pl-4">
-            <div className="text-xs font-mono text-white/40 mb-1">PIPELINE_LATENCY</div>
-            <div className="text-lg font-bold text-blue-400 font-mono">SUB_100MS_</div>
+        {/* Scroll hint */}
+        <div className="scroll-hint">
+          <div className="scroll-mouse">
+            <div className="scroll-wheel" />
           </div>
-
-          <div className="border-r border-white/5 pr-4 md:pl-4 col-span-1">
-            <div className="text-xs font-mono text-white/40 mb-1">ACTIVE_MODELS</div>
-            <div className="text-lg font-bold text-purple-400 font-mono">GEMINI_COGNITIVE_</div>
-          </div>
-
-          <div className="md:pl-4 col-span-1">
-            <div className="text-xs font-mono text-white/40 mb-1">GRAPH_RELATIONS</div>
-            <div className="text-lg font-bold text-amber-400 font-mono">10K+_ENTITIES_</div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </div>
-  </section>
+          <span>Scroll to explore</span>
+        </div>
+      </div>
+    </section>
   );
 }

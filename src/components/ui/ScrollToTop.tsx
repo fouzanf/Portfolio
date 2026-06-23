@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 
 export function ScrollToTop() {
@@ -14,14 +14,15 @@ export function ScrollToTop() {
     }
   }, []);
 
-  // On every route change, reset to the top immediately before content paints.
-  useEffect(() => {
+  // useLayoutEffect fires synchronously AFTER DOM mutations but BEFORE useEffect callbacks.
+  // React processes ALL useLayoutEffects before ANY useEffects across the whole tree.
+  // This means our scroll-to-0 fires before HeroSection's useEffect creates its
+  // GSAP ScrollTrigger, so the trigger initialises at scroll=0 (not a stale position).
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0); // synchronous — no RAF, no smooth easing
+
     const lenis = (window as any).__lenis;
-    if (lenis) {
-      lenis.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
-    }
+    if (lenis) lenis.scrollTo(0, { immediate: true });
   }, [pathname]);
 
   return null;
