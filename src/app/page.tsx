@@ -1,45 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { SkillsSection } from "@/components/sections/SkillsSection";
-import { ProjectsSection } from "@/components/sections/ProjectsSection";
+import { MissionBriefSection } from "@/components/sections/MissionBriefSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
-import { EducationSection } from "@/components/sections/EducationSection";
+import { ProjectsSection } from "@/components/sections/ProjectsSection";
+import { SkillsSection } from "@/components/sections/SkillsSection";
+import { ContactSection } from "@/components/sections/ContactSection";
+import { CommandPalette } from "@/components/ui/CommandPalette";
+import { ScrollProgress } from "@/components/ui/ScrollProgress";
+import { ScrollAnimations } from "@/components/ui/ScrollAnimations";
 
 export default function Home() {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
   return (
-    <main className="min-h-screen bg-background selection:bg-blue-500/30 relative overflow-hidden">
-      {/* Global Mouse Spotlight */}
-      <div
-        className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300 opacity-60"
-        style={{
-          background: `radial-gradient(600px at ${mousePos.x}px ${mousePos.y}px, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.05) 50%, transparent 80%)`,
-        }}
-      />
-      
+    <main className="min-h-screen bg-black text-white selection:bg-blue-500/30 relative overflow-hidden flex flex-col">
+      <ScrollProgress />
+      <ScrollAnimations />
       <Navbar />
-      
+
       <HeroSection />
-      <SkillsSection />
-      <ProjectsSection />
+      <div className="section-divider" />
+      <MissionBriefSection />
+      <div className="section-divider" />
       <ExperienceSection />
-      <EducationSection />
-      
+      <div className="section-divider" />
+      <ProjectsSection />
+      <div className="section-divider" />
+      <SkillsSection />
+      <div className="section-divider" />
+      <ContactSection />
+
       <Footer />
+      <CommandPalette />
     </main>
   );
 }

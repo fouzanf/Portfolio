@@ -1,91 +1,94 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { SectionHeading } from "../ui/SectionHeading";
-import { Badge } from "../ui/Badge";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
-const skillCategories = [
-  {
-    title: "AI & ML",
-    skills: ["Generative AI", "LLMs", "RAG Systems", "Prompt Engineering", "Model Alignment"],
-    gradient: "from-blue-500/20 to-purple-500/20",
-    border: "border-blue-500/20",
-  },
-  {
-    title: "Languages",
-    skills: ["Python", "JavaScript", "TypeScript", "C++"],
-    gradient: "from-yellow-500/20 to-orange-500/20",
-    border: "border-yellow-500/20",
-  },
-  {
-    title: "Frontend",
-    skills: ["React", "Next.js", "Tailwind CSS", "Framer Motion", "HTML5", "CSS3", "Shadcn UI"],
-    gradient: "from-cyan-500/20 to-blue-500/20",
-    border: "border-cyan-500/20",
-  },
-  {
-    title: "Backend & Databases",
-    skills: ["Node.js", "Express.js", "FastAPI", "Flask", "Prisma ORM", "MongoDB Atlas", "Supabase", "Neon DB", "Firebase", "Neo4j", "Pinecone"],
-    gradient: "from-green-500/20 to-emerald-500/20",
-    border: "border-green-500/20",
-  },
-];
-
-function SkillCard({ category, idx }: { category: any; idx: number }) {
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setCoords({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, delay: idx * 0.1 }}
-      onMouseMove={handleMouseMove}
-      className={`glass-panel p-8 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all duration-300 z-0`}
-    >
-      {/* Spotlight Spotlight Glow */}
-      <div
-        className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
-        style={{
-          background: `radial-gradient(400px circle at ${coords.x}px ${coords.y}px, rgba(255, 255, 255, 0.05), transparent 80%)`,
-        }}
-      />
-      <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none z-0`} />
-      
-      <h3 className="text-2xl font-semibold mb-6 relative z-10">{category.title}</h3>
-      <div className="flex flex-wrap gap-2 relative z-10">
-        {category.skills.map((skill: string) => (
-          <Badge key={skill} variant="glass" className="group-hover:bg-white/10 group-hover:border-white/20 transition-colors">
-            {skill}
-          </Badge>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
+const techStack = {
+  row1: [
+    { name: "React",         icon: "https://cdn.simpleicons.org/react/61DAFB" },
+    { name: "Next.js",       icon: "https://cdn.simpleicons.org/nextdotjs/ffffff" },
+    { name: "TypeScript",    icon: "https://cdn.simpleicons.org/typescript/3178c6" },
+    { name: "Tailwind CSS",  icon: "https://cdn.simpleicons.org/tailwindcss/06b6d4" },
+    { name: "Framer Motion", icon: "https://cdn.simpleicons.org/framermotion/00F5FF" },
+    { name: "Docker",        icon: "https://cdn.simpleicons.org/docker/2496ed" },
+    { name: "FastAPI",       icon: "https://cdn.simpleicons.org/fastapi/009688" },
+    { name: "Vercel",        icon: "https://cdn.simpleicons.org/vercel/ffffff" },
+  ],
+  row2: [
+    { name: "Python",     icon: "https://cdn.simpleicons.org/python/ffd43b" },
+    { name: "TensorFlow", icon: "https://cdn.simpleicons.org/tensorflow/ff6f00" },
+    { name: "PostgreSQL", icon: "https://cdn.simpleicons.org/postgresql/336791" },
+    { name: "MongoDB",    icon: "https://cdn.simpleicons.org/mongodb/47a248" },
+    { name: "InfluxDB",   icon: "https://cdn.simpleicons.org/influxdb/22adf6" },
+    { name: "Neo4j",      icon: "https://cdn.simpleicons.org/neo4j/008CC1" },
+    { name: "Prisma",     icon: "https://cdn.simpleicons.org/prisma/ffffff" },
+    { name: "Supabase",   icon: "https://cdn.simpleicons.org/supabase/3ECF8E" },
+  ],
+};
 
 export function SkillsSection() {
-  return (
-    <section id="skills" className="py-24 relative">
-      <div className="max-w-7xl mx-auto px-6">
-        <SectionHeading 
-          title="Tech Stack & Expertise" 
-          subtitle="A comprehensive toolkit for building modern, AI-integrated web applications."
-        />
+  const containerRef = useRef<HTMLElement>(null);
+  const marqueeLeftRef = useRef<HTMLDivElement>(null);
+  const marqueeRightRef = useRef<HTMLDivElement>(null);
 
-        <div className="grid md:grid-cols-2 gap-6 mt-16">
-          {skillCategories.map((category, idx) => (
-            <SkillCard key={category.title} category={category} idx={idx} />
-          ))}
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    if (!containerRef.current) return;
+
+    const pills = document.querySelectorAll(".tech-pill");
+    pills.forEach((pill) => {
+      pill.addEventListener("mouseenter", () => {
+        gsap.to(pill, { scale: 1.08, y: -4, duration: 0.3, ease: "back.out(2)" });
+      });
+      pill.addEventListener("mouseleave", () => {
+        gsap.to(pill, { scale: 1, y: 0, duration: 0.35, ease: "power2.out" });
+      });
+    });
+
+    if (marqueeLeftRef.current && marqueeRightRef.current) {
+      marqueeLeftRef.current.innerHTML += marqueeLeftRef.current.innerHTML;
+      marqueeRightRef.current.innerHTML += marqueeRightRef.current.innerHTML;
+      gsap.to(marqueeLeftRef.current, { xPercent: -50, ease: "none", duration: 30, repeat: -1 });
+      gsap.fromTo(marqueeRightRef.current, { xPercent: -50 }, { xPercent: 0, ease: "none", duration: 30, repeat: -1 });
+    }
+  }, []);
+
+  return (
+    <section id="skills" ref={containerRef} className="py-24 bg-black overflow-hidden relative">
+      <div className="section-divider absolute top-0 left-0 right-0" />
+
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="section-heading-wrapper w-full md:w-fit mx-auto md:mx-0 mb-10 md:mb-14">
+          <span className="section-number">04</span>
+          <p className="section-label">· TECH STACK</p>
+          <h2 className="section-heading section-title">What I Build With</h2>
+          <div className="heading-line" />
+        </div>
+      </div>
+
+      <div className="tech-marquee-section select-none">
+        <div className="marquee-row-wrapper">
+          <div className="overflow-hidden w-full flex">
+            <div ref={marqueeLeftRef} className="marquee-row flex">
+              {techStack.row1.map((tech, idx) => (
+                <div key={idx} className="tech-pill">
+                  <img src={tech.icon} alt={tech.name} />
+                  <span>{tech.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="overflow-hidden w-full flex">
+            <div ref={marqueeRightRef} className="marquee-row flex">
+              {techStack.row2.map((tech, idx) => (
+                <div key={idx} className="tech-pill">
+                  <img src={tech.icon} alt={tech.name} />
+                  <span>{tech.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

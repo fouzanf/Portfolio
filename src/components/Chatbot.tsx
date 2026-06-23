@@ -84,8 +84,7 @@ export function Chatbot() {
           { role: "assistant", content: "I encountered an error. Please try again." },
         ]);
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: "Connection error. Please check your network." },

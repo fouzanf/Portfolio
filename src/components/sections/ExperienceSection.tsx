@@ -1,61 +1,126 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Briefcase } from "lucide-react";
-import { SectionHeading } from "../ui/SectionHeading";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 export function ExperienceSection() {
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Timeline line draws itself
+    gsap.to(".timeline-progress-line", {
+      strokeDashoffset: 0,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".timeline-container",
+        start: "top 75%",
+        end: "bottom 25%",
+        scrub: 1,
+      }
+    });
+
+    // Card slides up and fades in
+    gsap.fromTo(".exp-card",
+      { y: 60, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".exp-card",
+          start: "top 85%",
+          toggleActions: "play none none none",
+        }
+      }
+    );
+
+    // Dot glow pulse when it enters view
+    ScrollTrigger.create({
+      trigger: ".exp-dot",
+      start: "top 80%",
+      onEnter: () => {
+        gsap.fromTo(".exp-dot-inner",
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" }
+        );
+      }
+    });
+
+    // Bullet points stagger in
+    gsap.fromTo(".exp-bullets li",
+      { x: -20, opacity: 0 },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".exp-bullets",
+          start: "top 85%",
+        }
+      }
+    );
+  }, []);
+
   return (
-    <section id="experience" className="py-24 relative">
-      <div className="max-w-4xl mx-auto px-6">
-        <SectionHeading 
-          title="Professional Experience" 
-        />
+    <section className="experience-section" id="experience">
+      <div className="section-heading-wrapper w-full md:w-fit">
+        <span className="section-bg-number">02</span>
+        <p className="section-label">· EXPERIENCE</p>
+        <h2 className="section-title">Where I've Worked</h2>
+      </div>
 
-        <div className="mt-16 relative">
-          {/* Timeline line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-white/10 hidden md:block" />
+      <div className="timeline-container">
+        {/* Animated SVG line */}
+        <div className="timeline-line-wrap">
+          <svg className="timeline-svg" width="2" height="100%"
+            preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#3B82F6" />
+                <stop offset="100%" stopColor="#8B5CF6" />
+              </linearGradient>
+            </defs>
+            <line className="timeline-bg-line"
+              x1="1" y1="0" x2="1" y2="100%"
+              stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
+            <line className="timeline-progress-line"
+              x1="1" y1="0" x2="1" y2="100%"
+              stroke="url(#lineGrad)" strokeWidth="2"
+              strokeDasharray="2000" strokeDashoffset="2000" />
+          </svg>
+        </div>
 
-          {/* Deccan AI */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-            className="relative flex flex-col md:flex-row gap-8 items-start"
-          >
-            {/* Timeline dot */}
-            <div className="hidden md:flex relative z-10 w-16 h-16 rounded-full glass items-center justify-center shrink-0 border-blue-500/30">
-              <Briefcase className="w-6 h-6 text-blue-400" />
-            </div>
-
-            <div className="glass-panel p-8 rounded-2xl flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-                <div>
-                  <h3 className="text-2xl font-bold">AI Prompt Engineering Intern</h3>
-                  <div className="text-blue-400 font-medium">Deccan AI</div>
-                </div>
-                <div className="px-3 py-1 rounded-full bg-white/5 text-sm text-white/60 border border-white/10 whitespace-nowrap">
-                  Feb 2026 - Apr 2026
-                </div>
+        {/* Experience card */}
+        <div className="exp-card">
+          <div className="exp-dot">
+            <div className="exp-dot-inner" />
+            <div className="exp-dot-ring" />
+          </div>
+          <div className="exp-content">
+            <div className="exp-header">
+              <div>
+                <h3 className="exp-role">AI Prompt Engineering Intern</h3>
+                <p className="exp-company">Deccan AI</p>
               </div>
-              
-              <ul className="space-y-3 text-white/70 mt-6">
-                <li className="flex gap-3">
-                  <span className="text-blue-500 mt-1">▹</span>
-                  <span>Evaluated next-generation generative video models against naturalness benchmarks, identifying critical optimization paths.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-500 mt-1">▹</span>
-                  <span>Designed multi-layered style transfer prompt templates to significantly improve visual output consistency.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-500 mt-1">▹</span>
-                  <span>Documented edge-case failures to support model optimization and algorithmic refinement for the core ML team.</span>
-                </li>
-              </ul>
+              <span className="exp-date">Feb 2026 – Apr 2026</span>
             </div>
-          </motion.div>
+            <p className="exp-location">📍 Bengaluru, Karnataka (Remote)</p>
+            <ul className="exp-bullets">
+              <li>Evaluated next-gen generative video models against naturalness benchmarks</li>
+              <li>Designed prompt templates for complex multi-layered style transfers</li>
+              <li>Documented edge-case failures for model optimization cycles</li>
+              <li>Reviewed model output across complex lighting, shadows, and reflections</li>
+            </ul>
+            <div className="exp-tags">
+              {["Prompt Engineering","Generative AI","Video Models","Model Alignment"].map(t => (
+                <span key={t} className="exp-tag">{t}</span>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
