@@ -220,7 +220,7 @@ export function HeroSection() {
           </button>
 
           <a
-            href="https://drive.google.com/file/d/19g6D8H_bdxX3LxCaXq5ReE6X-EeJ1yuB/view"
+            href="https://drive.google.com/file/d/1ObLVCfY0ZmA-Mzuc_hWQotJhSlsPVgZZ/view?usp=drive_link"
             target="_blank"
             rel="noopener noreferrer"
             className="hero-cta hero-cta-secondary"
