@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Built a portfolio that thinks, responds, and ships.
+Not a template. Not a theme. Built from scratch. 👇
 
-## Getting Started
+While most portfolios are just static resume pages —
+mine has an AI assistant that answers recruiter 
+questions in real time.
 
-First, run the development server:
+Here's what's under the hood:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🔹 EnPassant — AI Proxy Gateway
+→ PII redaction pipeline on every request
+→ Hash-based exact-match semantic caching
+→ Sliding window rate limiting
+→ Response time: 2-5ms
+Stack: Python · FastAPI · MongoDB · Next.js
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🔹 Graphenautic — Knowledge Graph RAG Platform
+→ Multi-tenant architecture (zero cross-tenant leakage)
+→ Documents → interactive knowledge graph canvases
+→ Hybrid Pinecone vector + Neo4j graph traversal
+→ Session-scoped Cypher query isolation
+Stack: Next.js · FastAPI · Neo4j · Pinecone · Zustand
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🔹 Veritas AI — Misinformation Detection
+→ Real-time claim verification pipeline
+→ Google OAuth + NextAuth session management
+→ Gemini API for contextual fact analysis
+Stack: Next.js · Gemini API · NextAuth
 
-## Learn More
+🔹 SENSAI — AI Mock Interview Coach
+→ Async background job processing via Inngest
+→ Real-time feedback on answers
+→ Role-specific question generation
+Stack: Next.js · Inngest · Gemini API
 
-To learn more about Next.js, take a look at the following resources:
+━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Every project is live. Every project solves a 
+real engineering problem.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The AI assistant on my portfolio (3rd photo above 👆) 
+can answer questions about my projects, stack, 
+and experience — in real time. Try it yourself.
 
-## Deploy on Vercel
+━━━━━━━━━━━━━━━━━━━━━━━━━
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Final year ECE student.
+Interned at Deccan AI evaluating generative 
+video models against production quality benchmarks.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+I build AI products that work in production —
+not just in README files.
+
+Currently open to full-time and internship roles in:
+→ Generative AI Engineering
+→ Full-Stack Development (AI-first products)
+→ Bengaluru preferred · Remote open
+
+Portfolio link in the comments 👇
+DMs open. Let's talk.
+
+#GenerativeAI #FullStackDeveloper #NextJS #FastAPI
+#Neo4j #RAG #AIEngineering #OpenToWork
+#BengaluruJobs #LLM #PortfolioProject
