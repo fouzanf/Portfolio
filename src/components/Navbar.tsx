@@ -82,13 +82,13 @@ export function Navbar() {
             aria-label="Open command palette"
           >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="opacity-50">
-              <path d="M3.5 1a2.5 2.5 0 0 0 0 5h6a2.5 2.5 0 0 0 0-5h-6ZM1 3.5a2.5 2.5 0 0 1 5 0v6a2.5 2.5 0 0 1-5 0v-6ZM7 9.5a2.5 2.5 0 0 1 5 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+              <path d="M3.5 1a2.5 2.5 0 0 0 0 5h6a2.5 2.5 0 0 0 0-5h-6ZM1 3.5a2.5 2.5 0 0 1 5 0v6a2.5 2.5 0 0 1-5 0v-6ZM7 9.5a2.5 2.5 0 0 1 5 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
             </svg>
             <span>Search</span>
             <kbd>⌘K</kbd>
           </button>
           <a
-            href="https://github.com/fouzanf17"
+            href="https://github.com/fouzanf"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-icon"
