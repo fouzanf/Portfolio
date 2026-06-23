@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { Github } from "../ui/Icons";
 import { Badge } from "../ui/Badge";
@@ -17,7 +18,7 @@ const projects = [
     stack: ["Python", "FastAPI", "MongoDB Atlas", "Next.js", "Tailwind CSS", "Vercel"],
     accent: "#3B82F6",
     highlight: "O(1) cache · 2–5ms · Zero token cost",
-    liveUrl: "https://enpassant-chess.vercel.app/",
+    liveUrl: "https://en-passant-six.vercel.app/",
     githubUrl: "https://github.com/fouzanf/enpassant"
   },
   {
@@ -50,8 +51,8 @@ const projects = [
     stack: ["Next.js", "TypeScript", "Gemini API", "Neon DB", "Clerk", "Inngest"],
     accent: "#F59E0B",
     highlight: "Real-time AI feedback · Async inference",
-    liveUrl: "https://sensai-learn.vercel.app/",
-    githubUrl: "https://github.com/fouzanf/sensai"
+    liveUrl: "https://sensai-rose.vercel.app/",
+    githubUrl: "https://github.com/fouzanf/AI-Career-Coach-Sensai"
   },
   {
     id: "vehiql",
@@ -68,6 +69,7 @@ const projects = [
 
 function ProjectCard({ project, index }: { project: typeof projects[0], index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const card = cardRef.current;
@@ -77,7 +79,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0], index: n
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      
+
       gsap.to(card, {
         rotateY: x * 12,
         rotateX: -y * 12,
@@ -122,9 +124,9 @@ function ProjectCard({ project, index }: { project: typeof projects[0], index: n
 
         {/* Thin Scanline Effect */}
         <div className="absolute inset-0 pointer-events-none z-10 opacity-10 mix-blend-overlay rounded-3xl group-hover:opacity-20 transition-opacity"
-             style={{ backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)' }} 
+          style={{ backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)' }}
         />
-        
+
         {/* Accent Glow border effect */}
         <div className="absolute inset-0 pointer-events-none z-[5] rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_50px_var(--accent)_inset]" />
 
@@ -182,7 +184,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0], index: n
           </div>
 
           <button
-            onClick={() => window.location.href = slugPath}
+            onClick={() => router.push(slugPath)}
             className="inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-all duration-300 overflow-hidden relative group/btn md:opacity-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 shrink-0"
           >
             <span className="relative z-10 flex items-center">
@@ -200,7 +202,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0], index: n
 export function ProjectsSection() {
   const containerRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [hintVisible, setHintVisible] = useState(true);
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -383,18 +385,18 @@ export function ProjectsSection() {
 
   return (
     <section className="projects-section bg-black" ref={containerRef}>
-      
+
       {/* Section header — compact, clean */}
       <div className="projects-header">
         {/* Background number — much smaller and more faded */}
         <span className="section-bg-number">03</span>
-        
+
         {/* ONE label only — not both label and title showing same info */}
         <span className="section-label">· SELECTED WORK</span>
-        
+
         {/* Title — properly sized, not giant */}
         <h2 className="section-title">Projects</h2>
-        
+
         <p className="section-subtitle">
           Things I've built that actually ship
         </p>
@@ -402,26 +404,25 @@ export function ProjectsSection() {
 
       {/* Scrolling cards track — completely separate from header */}
       <div className="projects-track-wrapper">
-        
+
         {/* Swipe explore hint */}
-        <div 
-          className={`absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none transition-all duration-500 flex items-center gap-4 text-cyan-400 font-mono bg-black/60 px-8 py-2 rounded-full border border-cyan-400/30 backdrop-blur-md ${
-            hintVisible ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-          }`}
+        <div
+          className={`absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none transition-all duration-500 flex items-center gap-4 text-cyan-400 font-mono bg-black/60 px-8 py-2 rounded-full border border-cyan-400/30 backdrop-blur-md ${hintVisible ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+            }`}
         >
           Swipe/Scroll to explore <ArrowRight className="w-5 h-5 animate-pulse" />
         </div>
 
         {/* Arrow buttons */}
-        <button 
-          onClick={scrollToPrev} 
+        <button
+          onClick={scrollToPrev}
           disabled={activeIndex === 0}
           className="absolute left-6 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full border border-white/10 bg-black/50 backdrop-blur-md flex items-center justify-center text-white hover:border-cyan-400 hover:text-cyan-400 disabled:opacity-20 disabled:pointer-events-none transition-all duration-300 cursor-pointer"
         >
           ←
         </button>
-        <button 
-          onClick={scrollToNext} 
+        <button
+          onClick={scrollToNext}
           disabled={activeIndex === projects.length - 1}
           className="absolute right-6 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full border border-white/10 bg-black/50 backdrop-blur-md flex items-center justify-center text-white hover:border-cyan-400 hover:text-cyan-400 disabled:opacity-20 disabled:pointer-events-none transition-all duration-300 cursor-pointer"
         >
@@ -438,7 +439,7 @@ export function ProjectsSection() {
       {/* Progress bar and dots BELOW cards */}
       <div className="projects-controls relative h-16 w-full">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/10 z-[100]">
-          <div 
+          <div
             className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 transition-all duration-300 origin-left"
             style={{ width: `${progressPercent * 100}%` }}
           />
@@ -448,11 +449,10 @@ export function ProjectsSection() {
             <button
               key={i}
               onClick={() => scrollToCard(i)}
-              className={`w-3.5 h-3.5 rounded-full transition-all duration-300 cursor-pointer ${
-                activeIndex === i 
-                  ? "bg-cyan-400 scale-125 shadow-[0_0_10px_#00f5ff]" 
-                  : "bg-white/20 hover:bg-white/40"
-              }`}
+              className={`w-3.5 h-3.5 rounded-full transition-all duration-300 cursor-pointer ${activeIndex === i
+                ? "bg-cyan-400 scale-125 shadow-[0_0_10px_#00f5ff]"
+                : "bg-white/20 hover:bg-white/40"
+                }`}
               aria-label={`Go to project ${i + 1}`}
             />
           ))}

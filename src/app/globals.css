@@ -1918,7 +1918,7 @@ img, video, canvas, svg {
 .hero-section {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh; /* dvh accounts for mobile browser chrome/address bar */
   display: flex;
   align-items: center;
   justify-content: center;

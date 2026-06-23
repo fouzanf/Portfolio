@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Syne } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Chatbot } from "@/components/Chatbot";
+import { Cursor } from "@/components/ui/Cursor";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
+import { SmoothScroll } from "@/components/ui/SmoothScroll";
 
-const geistSans = Geist({
+const inter = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const syne = Syne({
+  variable: "--font-heading",
   subsets: ["latin"],
 });
 
@@ -27,12 +31,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${inter.variable} ${syne.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col">
-        {children}
-        <Chatbot />
-        <Toaster theme="dark" closeButton richColors position="bottom-right" />
+      <body className="min-h-full flex flex-col bg-black text-white">
+        <SmoothScroll>
+          <ScrollToTop />
+          <PageLoader />
+          <Cursor />
+          {children}
+          <Chatbot />
+          <Toaster theme="dark" closeButton richColors position="bottom-right" />
+        </SmoothScroll>
       </body>
     </html>
   );
